@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "iamarmor"
+version = "0.0.1"
+description = "IAM Policy Analyzer & Fixer"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    {name = "LLM Armor", email = "hello@iamarmor.dev"},
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/iam-armor/iamarmor"
+Issues = "https://github.com/iam-armor/iamarmor/issues"
