@@ -1,0 +1,8 @@
+- id: iamarmor
+  name: iamarmor (IAM policy linter)
+  description: Lint Terraform IAM policies for over-permissioned configs
+  entry: iamarmor lint
+  language: python
+  types: [terraform]
+  pass_filenames: false
+  args: ["--format", "text"]

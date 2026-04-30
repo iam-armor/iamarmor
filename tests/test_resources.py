@@ -26,7 +26,7 @@ def _extract(filename: str) -> list[IamResource]:
 
 class TestPublicApi:
     def test_version_is_set(self):
-        assert iamarmor.__version__ == "0.0.2"
+        assert iamarmor.__version__ == "0.1.0"
 
     def test_all_public_names_importable(self):
         from iamarmor import (  # noqa: F401

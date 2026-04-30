@@ -1,26 +1,64 @@
 # iamarmor
 IAM Policy Analyzer & Fixer
 
-## Status: Week 2 — rules engine + default rule pack
+## Status: Week 3 — CLI + config + PyPI publish
 
-The core Python library is live with a YAML-driven rules engine and 10 default IAM
-rules. Week 1 (HCL parser + IAM resource extractor) is already merged. The CLI
-(`iamarmor lint`) is coming in Week 3.
+The `iamarmor lint` CLI is live. Install from PyPI, point it at a Terraform
+directory, and get actionable findings in seconds.
 
-### Quick example — extract resources and run the engine
+## Quickstart
 
-```python
-from iamarmor import extract_from_directory, RuleEngine, load_default_rules
+```bash
+# Install (requires Python 3.10+)
+pipx install iamarmor
 
-resources = extract_from_directory("path/to/terraform/")
-engine = RuleEngine(rules=load_default_rules())
-findings = engine.run(resources)
+# Lint the current directory
+iamarmor lint .
 
-for finding in findings:
-    print(f"[{finding.rule_id}] {finding.severity.value.upper()} — {finding.message}")
+# Lint a specific file
+iamarmor lint modules/iam/main.tf
+
+# Machine-readable output for CI pipelines
+iamarmor lint . --format json
 ```
 
-### Default rule pack
+`iamarmor lint` exits **0** when clean, **1** when findings meet the `fail_on`
+threshold (default: `medium`), **2** on usage/config errors, and **3** on
+internal errors — making CI integration trivial.
+
+## Configuration
+
+Place a `.iamarmor.yml` in the root of your Terraform repository:
+
+```yaml
+version: 1
+severity_threshold: low   # report findings at or above this level (default: info)
+fail_on: high             # exit 1 only for high/critical (default: medium)
+
+rules:
+  ignore: [IAM004]        # skip specific rules
+```
+
+iamarmor auto-discovers the config by walking upward from the linted path
+(same pattern as `.eslintrc`). Use `--no-config` to skip loading.
+
+See [docs/config.md](docs/config.md) for the full configuration reference.
+
+## Pre-commit
+
+Add to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/iam-armor/iamarmor
+    rev: v0.1.0
+    hooks:
+      - id: iamarmor
+```
+
+See [docs/pre-commit.md](docs/pre-commit.md) for details.
+
+## Default rule pack
 
 iamarmor ships with **10 default IAM rules** covering the most common misconfigurations:
 
@@ -37,16 +75,31 @@ iamarmor ships with **10 default IAM rules** covering the most common misconfigu
 | IAM009 | No `NotResource` in Allow statements | Medium |
 | IAM010 | Do not attach `AdministratorAccess` managed policy | High |
 
-See [STARTER_RULES.md](STARTER_RULES.md) for full documentation of each rule with
-passing and failing examples.
+See [STARTER_RULES.md](STARTER_RULES.md) for full documentation of each rule.
 
-### Installation (development)
+## Python API
+
+The CLI is the recommended entry point for most users. For embedding iamarmor
+in other tools, the Python API is also public:
+
+```python
+from iamarmor import extract_from_directory, RuleEngine, load_default_rules
+
+resources = extract_from_directory("path/to/terraform/")
+engine = RuleEngine(rules=load_default_rules())
+findings = engine.run(resources)
+
+for finding in findings:
+    print(f"[{finding.rule_id}] {finding.severity.value.upper()} — {finding.message}")
+```
+
+## Installation (development)
 
 ```bash
 pip install -e ".[dev]"
 ```
 
-### Running tests
+## Running tests
 
 ```bash
 pytest
