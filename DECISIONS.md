@@ -108,7 +108,27 @@ so no long-lived credentials are stored in the repository.
 - PyPI supports OIDC from GitHub Actions natively via `pypa/gh-action-pypi-publish`.
 
 
-## Week 4 — README rewritten for PyPI/Marketplace readiness; CI updated with Python 3.11+3.12 matrix and a dedicated `package` job (`python -m build` + `twine check`); `STARTER_RULES.md` extended with ❌/✅ examples and per-rule configuration snippets as the canonical default-rule reference; `docs/demo.tape` added as a reproducible VHS recording script; dogfooding pass documented in `docs/DOGFOODING.md` against 5 real public Terraform repos — no blocking bugs found, 3 follow-up enhancement candidates noted.
+## Week 4 — Polish + dogfood + content
+
+**Status:** Accepted
+
+**Context:**
+Week 4 focused on polishing the OSS CLI for Marketplace/PyPI readiness without
+adding new linter features.
+
+**Decisions and outcomes:**
+- README rewritten with hero tagline, badges, demo GIF placeholder, quickstart,
+  config example, pre-commit/CI snippets, roadmap, and contributing guide.
+- CI workflow updated: Python 3.11+3.12 matrix, pip cache, `pytest -q`; separate
+  `package` job added (`python -m build` + `twine check`) to verify the wheel
+  builds cleanly on every push.
+- `STARTER_RULES.md` extended with ❌/✅ labelled examples and a "How to
+  disable/configure" snippet for every rule — canonical OSS rule reference.
+- `docs/demo.tape` added as a reproducible VHS recording script.
+- Dogfooding pass run against 5 real public Terraform repos and documented in
+  `docs/DOGFOODING.md`. No blocking bugs found; 3 follow-up enhancement
+  candidates noted (Condition-awareness for IAM006/IAM007, verbose skip
+  reporting, `aws_iam_policy_document` data-source analysis).
 
 **Status:** Accepted
 
