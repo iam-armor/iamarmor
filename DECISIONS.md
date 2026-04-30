@@ -107,11 +107,28 @@ so no long-lived credentials are stored in the repository.
   not a project-wide token.
 - PyPI supports OIDC from GitHub Actions natively via `pypa/gh-action-pypi-publish`.
 
-**Manual step required:**
-One-time setup on PyPI to register the trusted publisher (documented in
-`docs/release.md`). This cannot be automated from within the workflow itself.
 
+## Week 4 — Polish + dogfood + content
 
+**Status:** Accepted
+
+**Context:**
+Week 4 focused on polishing the OSS CLI for Marketplace/PyPI readiness without
+adding new linter features.
+
+**Decisions and outcomes:**
+- README rewritten with hero tagline, badges, demo GIF placeholder, quickstart,
+  config example, pre-commit/CI snippets, roadmap, and contributing guide.
+- CI workflow updated: Python 3.11+3.12 matrix, pip cache, `pytest -q`; separate
+  `package` job added (`python -m build` + `twine check`) to verify the wheel
+  builds cleanly on every push.
+- `STARTER_RULES.md` extended with ❌/✅ labelled examples and a "How to
+  disable/configure" snippet for every rule — canonical OSS rule reference.
+- `docs/demo.tape` added as a reproducible VHS recording script.
+- Dogfooding pass run against 5 real public Terraform repos and documented in
+  `docs/DOGFOODING.md`. No blocking bugs found; 3 follow-up enhancement
+  candidates noted (Condition-awareness for IAM006/IAM007, verbose skip
+  reporting, `aws_iam_policy_document` data-source analysis).
 
 **Status:** Accepted
 

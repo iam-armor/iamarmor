@@ -24,7 +24,15 @@ principal. This is almost never intentional in production and is the single most
 common overly-permissive IAM mistake. Always grant the minimum set of actions
 actually required.
 
-**Passing example** (`tests/fixtures/rules/IAM001_action_wildcard/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM001_action_wildcard/fail.tf`):
+```hcl
+resource "aws_iam_policy" "bad" {
+  name   = "bad"
+  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\"}]}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM001_action_wildcard/pass.tf`):
 ```hcl
 resource "aws_iam_policy" "example" {
   name   = "example"
@@ -32,12 +40,13 @@ resource "aws_iam_policy" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM001_action_wildcard/fail.tf`):
-```hcl
-resource "aws_iam_policy" "bad" {
-  name   = "bad"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":\"*\",\"Resource\":\"*\"}]}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM001]          # disable entirely
+  overrides:
+    IAM001:
+      severity: critical    # escalate to critical for stricter enforcement
 ```
 
 ---
@@ -54,7 +63,15 @@ resource "aws_iam_policy" "bad" {
 `secretsmanager:*`, `sts:*`) with `Resource: "*"` grants unscoped access to every
 resource in the account. Always constrain the Resource to specific ARNs.
 
-**Passing example** (`tests/fixtures/rules/IAM002_resource_wildcard_sensitive/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM002_resource_wildcard_sensitive/fail.tf`):
+```hcl
+resource "aws_iam_policy" "bad" {
+  name   = "bad"
+  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:*\"],\"Resource\":\"*\"}]}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM002_resource_wildcard_sensitive/pass.tf`):
 ```hcl
 resource "aws_iam_policy" "example" {
   name   = "example"
@@ -62,12 +79,13 @@ resource "aws_iam_policy" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM002_resource_wildcard_sensitive/fail.tf`):
-```hcl
-resource "aws_iam_policy" "bad" {
-  name   = "bad"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:*\"],\"Resource\":\"*\"}]}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM002]          # disable entirely
+  overrides:
+    IAM002:
+      severity: critical    # escalate for environments with strict data-access controls
 ```
 
 ---
@@ -84,7 +102,16 @@ resource "aws_iam_policy" "bad" {
 harder to audit, cannot be reused across multiple principals, and are deleted when
 the principal is deleted. Use `aws_iam_policy` + a policy attachment resource instead.
 
-**Passing example** (`tests/fixtures/rules/IAM003_no_inline_policies/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM003_no_inline_policies/fail.tf`):
+```hcl
+resource "aws_iam_role_policy" "bad" {
+  name   = "bad-inline"
+  role   = "my-role"
+  policy = "{...}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM003_no_inline_policies/pass.tf`):
 ```hcl
 resource "aws_iam_role_policy_attachment" "example" {
   role       = "my-role"
@@ -92,13 +119,10 @@ resource "aws_iam_role_policy_attachment" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM003_no_inline_policies/fail.tf`):
-```hcl
-resource "aws_iam_role_policy" "bad" {
-  name   = "bad-inline"
-  role   = "my-role"
-  policy = "{...}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM003]          # disable if your org permits inline policies
 ```
 
 ---
@@ -116,7 +140,15 @@ for roles assumed via STS. Setting a shorter duration reduces the window in whic
 leaked credentials can be exploited. It is also a clear signal of intent in your
 Terraform configuration.
 
-**Passing example** (`tests/fixtures/rules/IAM004_role_max_session_duration/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM004_role_max_session_duration/fail.tf`):
+```hcl
+resource "aws_iam_role" "bad" {
+  name               = "bad"
+  assume_role_policy = "{...}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM004_role_max_session_duration/pass.tf`):
 ```hcl
 resource "aws_iam_role" "example" {
   name                 = "example"
@@ -125,12 +157,10 @@ resource "aws_iam_role" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM004_role_max_session_duration/fail.tf`):
-```hcl
-resource "aws_iam_role" "bad" {
-  name               = "bad"
-  assume_role_policy = "{...}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM004]          # disable if you accept AWS's default session duration
 ```
 
 ---
@@ -148,7 +178,15 @@ to pass any role in the account to any service, which is a well-known privilege
 escalation vector. Always constrain `Resource` to the specific role ARNs that need
 to be passed.
 
-**Passing example** (`tests/fixtures/rules/IAM005_passrole_resource_wildcard/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM005_passrole_resource_wildcard/fail.tf`):
+```hcl
+resource "aws_iam_policy" "bad" {
+  name   = "bad"
+  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"iam:PassRole\"],\"Resource\":\"*\"}]}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM005_passrole_resource_wildcard/pass.tf`):
 ```hcl
 resource "aws_iam_policy" "example" {
   name   = "example"
@@ -156,12 +194,13 @@ resource "aws_iam_policy" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM005_passrole_resource_wildcard/fail.tf`):
-```hcl
-resource "aws_iam_policy" "bad" {
-  name   = "bad"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"iam:PassRole\"],\"Resource\":\"*\"}]}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM005]          # disable if IAM005 produces false positives in your setup
+  overrides:
+    IAM005:
+      severity: critical    # escalate for environments with strict privilege controls
 ```
 
 ---
@@ -178,7 +217,15 @@ resource "aws_iam_policy" "bad" {
 policy grants access to any AWS identity — or even unauthenticated internet traffic
 for some services. Always specify concrete principal ARNs.
 
-**Passing example** (`tests/fixtures/rules/IAM006_principal_wildcard/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM006_principal_wildcard/fail.tf`):
+```hcl
+resource "aws_iam_policy" "bad" {
+  name   = "bad"
+  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sts:AssumeRole\",\"Resource\":\"*\"}]}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM006_principal_wildcard/pass.tf`):
 ```hcl
 resource "aws_iam_policy" "example" {
   name   = "example"
@@ -186,12 +233,10 @@ resource "aws_iam_policy" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM006_principal_wildcard/fail.tf`):
-```hcl
-resource "aws_iam_policy" "bad" {
-  name   = "bad"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sts:AssumeRole\",\"Resource\":\"*\"}]}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM006]          # disable if you intentionally use public S3/SNS policies
 ```
 
 ---
@@ -209,7 +254,16 @@ resource "aws_iam_policy" "bad" {
 misconfiguration. Always specify the exact services or account ARNs that should be
 permitted to assume the role.
 
-**Passing example** (`tests/fixtures/rules/IAM007_assume_role_concrete_principal/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM007_assume_role_concrete_principal/fail.tf`):
+```hcl
+resource "aws_iam_role" "bad" {
+  name                 = "bad"
+  max_session_duration = 3600
+  assume_role_policy   = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sts:AssumeRole\"}]}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM007_assume_role_concrete_principal/pass.tf`):
 ```hcl
 resource "aws_iam_role" "example" {
   name                 = "example"
@@ -218,13 +272,13 @@ resource "aws_iam_role" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM007_assume_role_concrete_principal/fail.tf`):
-```hcl
-resource "aws_iam_role" "bad" {
-  name                 = "bad"
-  max_session_duration = 3600
-  assume_role_policy   = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"sts:AssumeRole\"}]}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM007]          # disable if your use case requires open trust policies
+  overrides:
+    IAM007:
+      severity: critical    # escalate for production environments
 ```
 
 ---
@@ -241,7 +295,15 @@ resource "aws_iam_role" "bad" {
 those listed. This pattern is counterintuitive and often grants far more than
 intended. Use explicit `Action` lists instead.
 
-**Passing example** (`tests/fixtures/rules/IAM008_not_action/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM008_not_action/fail.tf`):
+```hcl
+resource "aws_iam_policy" "bad" {
+  name   = "bad"
+  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"NotAction\":[\"iam:*\"],\"Resource\":\"*\"}]}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM008_not_action/pass.tf`):
 ```hcl
 resource "aws_iam_policy" "example" {
   name   = "example"
@@ -249,12 +311,10 @@ resource "aws_iam_policy" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM008_not_action/fail.tf`):
-```hcl
-resource "aws_iam_policy" "bad" {
-  name   = "bad"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"NotAction\":[\"iam:*\"],\"Resource\":\"*\"}]}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM008]          # disable if your org uses NotAction patterns deliberately
 ```
 
 ---
@@ -271,7 +331,15 @@ resource "aws_iam_policy" "bad" {
 resource *except* those listed. This pattern is error-prone and frequently exposes
 unintended resources. Use explicit `Resource` ARNs instead.
 
-**Passing example** (`tests/fixtures/rules/IAM009_not_resource/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM009_not_resource/fail.tf`):
+```hcl
+resource "aws_iam_policy" "bad" {
+  name   = "bad"
+  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\"],\"NotResource\":[\"arn:aws:s3:::protected-bucket/*\"]}]}"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM009_not_resource/pass.tf`):
 ```hcl
 resource "aws_iam_policy" "example" {
   name   = "example"
@@ -279,12 +347,10 @@ resource "aws_iam_policy" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM009_not_resource/fail.tf`):
-```hcl
-resource "aws_iam_policy" "bad" {
-  name   = "bad"
-  policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"s3:GetObject\"],\"NotResource\":[\"arn:aws:s3:::protected-bucket/*\"]}]}"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM009]          # disable if your policies use NotResource for deny patterns
 ```
 
 ---
@@ -301,7 +367,15 @@ resource "aws_iam_policy" "bad" {
 all AWS services and resources. Attaching it violates the principle of least
 privilege. Use a custom policy with only the permissions your workload actually needs.
 
-**Passing example** (`tests/fixtures/rules/IAM010_no_admin_managed_policy/pass.tf`):
+❌ **Bad example** (`tests/fixtures/rules/IAM010_no_admin_managed_policy/fail.tf`):
+```hcl
+resource "aws_iam_role_policy_attachment" "bad" {
+  role       = "my-role"
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+```
+
+✅ **Good example** (`tests/fixtures/rules/IAM010_no_admin_managed_policy/pass.tf`):
 ```hcl
 resource "aws_iam_role_policy_attachment" "example" {
   role       = "my-role"
@@ -309,10 +383,23 @@ resource "aws_iam_role_policy_attachment" "example" {
 }
 ```
 
-**Failing example** (`tests/fixtures/rules/IAM010_no_admin_managed_policy/fail.tf`):
-```hcl
-resource "aws_iam_role_policy_attachment" "bad" {
-  role       = "my-role"
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-}
+**How to disable / configure** via `.iamarmor.yml`:
+```yaml
+rules:
+  ignore: [IAM010]          # disable if you intentionally use AdministratorAccess (not recommended)
+  overrides:
+    IAM010:
+      severity: critical    # escalate for production environments
 ```
+
+---
+
+## Premium rule packs
+
+The 10 rules above are the OSS default pack, freely available in this repository.
+
+**Premium rule packs** — covering SOC 2, PCI-DSS, HIPAA, and the AWS
+Well-Architected Security Pillar — are available via the hosted app at
+**[iamarmor.dev](https://iamarmor.dev)** (coming soon). These packs extend
+the default 10 rules with dozens of additional checks mapped to specific
+compliance controls, and are not part of this OSS repository.
