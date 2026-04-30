@@ -11,8 +11,20 @@ requires-python = ">=3.10"
 authors = [
     {name = "LLM Armor", email = "hello@iamarmor.dev"},
 ]
-dependencies = []
+dependencies = [
+    "python-hcl2>=4.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "pytest-cov>=4", "ruff>=0.1"]
 
 [project.urls]
 Repository = "https://github.com/iam-armor/iamarmor"
 Issues = "https://github.com/iam-armor/iamarmor/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
