@@ -15,6 +15,18 @@ _IAM_RESOURCE_TYPES: frozenset[str] = frozenset(
         "aws_iam_role_policy",
         "aws_iam_user_policy",
         "aws_iam_group_policy",
+        "aws_iam_role_policy_attachment",
+        "aws_iam_user_policy_attachment",
+        "aws_iam_group_policy_attachment",
+    }
+)
+
+# Attachment resource types that carry a policy_arn but no inline policy document
+_IAM_ATTACHMENT_TYPES: frozenset[str] = frozenset(
+    {
+        "aws_iam_role_policy_attachment",
+        "aws_iam_user_policy_attachment",
+        "aws_iam_group_policy_attachment",
     }
 )
 

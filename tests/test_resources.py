@@ -26,7 +26,7 @@ def _extract(filename: str) -> list[IamResource]:
 
 class TestPublicApi:
     def test_version_is_set(self):
-        assert iamarmor.__version__ == "0.0.1"
+        assert iamarmor.__version__ == "0.0.2"
 
     def test_all_public_names_importable(self):
         from iamarmor import (  # noqa: F401
@@ -184,3 +184,38 @@ class TestExtractFromDirectory:
         r = resources[0]
         with pytest.raises((AttributeError, TypeError)):
             r.name = "mutated"  # type: ignore[misc]
+
+
+class TestExtractPolicyAttachments:
+    """Tests for Week 2: policy attachment resource extraction."""
+
+    def test_extracts_role_policy_attachment(self):
+        resources = _extract("policy_attachment.tf")
+        types = {r.resource_type for r in resources}
+        assert "aws_iam_role_policy_attachment" in types
+
+    def test_extracts_user_policy_attachment(self):
+        resources = _extract("policy_attachment.tf")
+        types = {r.resource_type for r in resources}
+        assert "aws_iam_user_policy_attachment" in types
+
+    def test_extracts_group_policy_attachment(self):
+        resources = _extract("policy_attachment.tf")
+        types = {r.resource_type for r in resources}
+        assert "aws_iam_group_policy_attachment" in types
+
+    def test_returns_three_attachments(self):
+        resources = _extract("policy_attachment.tf")
+        assert len(resources) == 3
+
+    def test_policy_arn_present_in_attributes(self):
+        resources = _extract("policy_attachment.tf")
+        role_attach = next(r for r in resources if r.resource_type == "aws_iam_role_policy_attachment")
+        assert "policy_arn" in role_attach.attributes
+
+    def test_attachment_has_no_policy_document(self):
+        """Attachment resources have no policy document — only a policy_arn reference."""
+        resources = _extract("policy_attachment.tf")
+        for r in resources:
+            assert r.attributes.get("policy_document") is None
+

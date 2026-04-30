@@ -1,0 +1,115 @@
+# iamarmor default rule pack — 10 foundational IAM rules
+# Each entry binds a rule ID / severity / message to a Python predicate (check:).
+# Resources whose policy_document is None (un-parseable expressions) are silently
+# skipped by the predicate helpers to avoid false positives.
+
+- id: IAM001
+  name: "No Action: \"*\""
+  severity: high
+  message: "IAM001: resource '{resource}' has a statement (index {stmt_index}) with Action: \"*\" — grant least-privilege actions instead."
+  check: iam001_action_wildcard
+  description: >
+    Any policy statement that uses Action: "*" grants every IAM action to the
+    principal. This is almost never intentional in production and is the single
+    most common overly-permissive IAM mistake.
+  tags: [least-privilege, cis-aws]
+
+- id: IAM002
+  name: "No Resource: \"*\" with sensitive actions"
+  severity: high
+  message: "IAM002: resource '{resource}' statement {stmt_index} allows '{action}' on Resource: \"*\" — scope the resource ARN."
+  check: iam002_resource_wildcard_sensitive
+  description: >
+    Combining a broad sensitive service action (s3:*, iam:*, kms:*,
+    secretsmanager:*, sts:*) with Resource: "*" grants unscoped access to every
+    resource in the account. Always constrain the Resource to specific ARNs.
+  tags: [least-privilege]
+
+- id: IAM003
+  name: No inline policies
+  severity: medium
+  message: "IAM003: '{resource}' is an inline policy ({resource_type}) — prefer managed policies for reusability and auditability."
+  check: iam003_no_inline_policies
+  description: >
+    Inline policies (aws_iam_role_policy, aws_iam_user_policy,
+    aws_iam_group_policy) are embedded directly on the principal. They are harder
+    to audit, cannot be reused, and are deleted when the principal is deleted.
+    Use aws_iam_policy + policy attachment instead.
+  tags: [best-practice]
+
+- id: IAM004
+  name: IAM roles must set max_session_duration
+  severity: low
+  message: "IAM004: aws_iam_role '{resource}' does not set max_session_duration — consider setting it to limit credential lifetime."
+  check: iam004_role_max_session_duration
+  description: >
+    Without an explicit max_session_duration, AWS defaults to 1 hour for roles
+    assumed via STS. Setting a shorter duration (e.g. 3600 seconds) reduces the
+    window in which leaked credentials can be exploited.
+  tags: [credential-hygiene]
+
+- id: IAM005
+  name: "No iam:PassRole with Resource: \"*\""
+  severity: high
+  message: "IAM005: resource '{resource}' statement {stmt_index} grants '{action}' on Resource: \"*\" — scope PassRole to specific role ARNs."
+  check: iam005_passrole_resource_wildcard
+  description: >
+    iam:PassRole with Resource: "*" effectively allows the principal to pass any
+    role in the account to any service, which is a privilege escalation vector.
+    Always constrain Resource to specific role ARNs.
+  tags: [privilege-escalation, least-privilege]
+
+- id: IAM006
+  name: No wildcard Principal in resource-based policies
+  severity: high
+  message: "IAM006: resource '{resource}' statement {stmt_index} has a wildcard Principal — this allows any AWS identity to assume/invoke the resource."
+  check: iam006_principal_wildcard
+  description: >
+    A wildcard Principal ("*" or AWS: "*") in a resource-based policy grants
+    access to any AWS identity (or even unauthenticated internet traffic for
+    some services). Always specify concrete principal ARNs.
+  tags: [least-privilege, public-access]
+
+- id: IAM007
+  name: assume_role_policy must specify a concrete principal
+  severity: high
+  message: "IAM007: assume_role_policy '{resource}' statement {stmt_index} has a missing or wildcard Principal — specify a concrete service or account ARN."
+  check: iam007_assume_role_concrete_principal
+  description: >
+    An assume_role_policy without a concrete principal (or with Principal: "*")
+    allows any identity to assume the role, which is a critical misconfiguration.
+    Always specify the exact services or account ARNs that should be allowed to
+    assume the role.
+  tags: [least-privilege, assume-role]
+
+- id: IAM008
+  name: No NotAction in Allow statements
+  severity: medium
+  message: "IAM008: resource '{resource}' statement {stmt_index} uses NotAction in an Allow effect — this may unintentionally grant broad permissions."
+  check: iam008_not_action
+  description: >
+    NotAction in an Allow statement grants every action *except* those listed.
+    This pattern often grants far more than intended. Prefer explicit Action lists.
+  tags: [least-privilege]
+
+- id: IAM009
+  name: No NotResource in Allow statements
+  severity: medium
+  message: "IAM009: resource '{resource}' statement {stmt_index} uses NotResource in an Allow effect — this may unintentionally expose all other resources."
+  check: iam009_not_resource
+  description: >
+    NotResource in an Allow statement grants the action on every resource *except*
+    those listed. This pattern is error-prone and frequently exposes unintended
+    resources. Prefer explicit Resource ARNs.
+  tags: [least-privilege]
+
+- id: IAM010
+  name: Do not attach AdministratorAccess managed policy
+  severity: high
+  message: "IAM010: resource '{resource}' attaches the AdministratorAccess managed policy — grant only the permissions actually required."
+  check: iam010_no_admin_managed_policy
+  description: >
+    The AWS-managed AdministratorAccess policy grants full access to all AWS
+    services and resources. Attaching it violates the principle of least privilege.
+    Use a custom policy with only the permissions your workload needs.
+  tags: [least-privilege, cis-aws]
