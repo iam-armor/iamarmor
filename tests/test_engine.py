@@ -9,7 +9,6 @@ import pytest
 from iamarmor import IamResource, RuleEngine
 from iamarmor.exceptions import UnknownCheckError
 from iamarmor.rules import Finding, Rule, Severity
-from iamarmor.rules.registry import CHECKS
 
 # Ensure checks are registered
 import iamarmor.rules.checks  # noqa: F401

@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0] — 2026-04-30
+
+### Added
+
+- **`iamarmor lint` CLI** (`src/iamarmor/cli/main.py`) built with
+  [Typer](https://typer.tiangolo.com/). Supports `--format text|json`,
+  `--config`, `--no-config`, `--severity-threshold`, `--fail-on`,
+  `--select`, `--ignore`, `--no-color`, `--verbose`, `--quiet`, `--version`.
+- **`.iamarmor.yml` config loader** (`src/iamarmor/cli/config.py`) — auto-discovery
+  walks upward from the linted path; hand-rolled YAML validator with clear error
+  messages; supports `version`, `severity_threshold`, `fail_on`, `rules.select`,
+  `rules.ignore`, `rules.overrides`, `paths.include`, `paths.exclude`.
+- **Human-readable text reporter** — colorized via [Rich](https://rich.readthedocs.io/),
+  grouped by file, with severity, rule ID, and summary footer.
+- **Machine-readable JSON reporter** (`--format json`) — stable schema documented in
+  `docs/json-output.md`; consumed by the future GitHub App handler.
+- **Exit codes**: `0` clean, `1` findings at or above `--fail-on` threshold, `2`
+  usage/config error, `3` internal error.
+- **`ConfigError`** added to `iamarmor.exceptions` (subclass of `IamArmorError`).
+- **`.pre-commit-hooks.yaml`** — plug-and-play pre-commit integration.
+- **`.github/workflows/ci.yml`** — matrix CI on Python 3.10, 3.11, 3.12 with
+  `ruff check` + `pytest --cov`.
+- **`.github/workflows/publish.yml`** — PyPI publish via OIDC trusted publishing on
+  `v*.*.*` tag push; no API tokens stored.
+- **`typer >= 0.12`** and **`rich >= 13`** added as runtime dependencies.
+- **`[project.scripts]`** entry point: `iamarmor = "iamarmor.cli.main:app"`.
+- **`[project.urls] Changelog`** link added to `pyproject.toml`.
+- **Test suite** extended to 140 tests: `test_cli.py`, `test_config.py`,
+  `test_reporters.py`, plus updated version assertion in `test_resources.py`.
+- **Docs**: `docs/config.md`, `docs/pre-commit.md`, `docs/json-output.md`,
+  `docs/release.md`.
+- **README** updated with Quickstart, Configuration, and Pre-commit sections.
+
 ## [0.0.2] — 2026-04-30
 
 ### Added

@@ -12,3 +12,7 @@ class RuleLoadError(IamArmorError):
 
 class UnknownCheckError(IamArmorError):
     """Raised when the engine encounters a rule whose check name is not registered."""
+
+
+class ConfigError(IamArmorError):
+    """Raised when a .iamarmor.yml config file is malformed or invalid."""

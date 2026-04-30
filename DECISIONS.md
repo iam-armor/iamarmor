@@ -46,7 +46,72 @@ registry (`@register_check` decorator).
 - The pattern scales cleanly to premium packs in Phase 2 (private `iamarmor-app` repo) —
   they import the same engine, just supply additional YAML + Python predicates.
 
-## 2026-04 — Resources with un-parseable `policy` expressions are skipped, not flagged
+## 2026-04 — Typer chosen for the CLI
+
+**Status:** Accepted
+
+**Context:**
+Week 3 required a polished CLI entry point for `iamarmor lint`. Both Click and
+Typer were considered.
+
+**Decision:**
+Use [Typer](https://typer.tiangolo.com/) (`typer >= 0.12`) as the CLI framework.
+
+**Rationale:**
+- Type-hint-driven: option definitions are just function arguments with type
+  annotations — less boilerplate, easier to read.
+- Built on Click under the hood, so the ecosystem (testing via `CliRunner`,
+  shell completion, integration with other Click apps) is fully compatible.
+- Rich integration for `--no-color` and pretty help text.
+
+**Trade-off:**
+One extra runtime dependency (Typer + Rich). The noticeably nicer CLI surface
+and reduced boilerplate justify this.
+
+## 2026-04 — Hand-rolled YAML config validator (no pydantic/jsonschema)
+
+**Status:** Accepted
+
+**Context:**
+`.iamarmor.yml` needs validation. pydantic and jsonschema are common choices.
+
+**Decision:**
+Hand-roll the validator in `src/iamarmor/cli/config.py` using only `pyyaml`
+(already a dep from Week 2).
+
+**Rationale:**
+- Schema is small (~6 top-level keys, shallow nesting) — a full schema library
+  adds more weight than it removes.
+- Error messages are tailored to users (mention the key name, the file path,
+  and the expected values) rather than generic schema-violation text.
+- Keeps the dependency footprint tight for a CLI tool.
+
+**Revisit condition:**
+If the config schema grows past ~8 keys with deep nesting, switch to pydantic v2.
+
+## 2026-04 — PyPI Trusted Publishing (OIDC) over API tokens
+
+**Status:** Accepted
+
+**Context:**
+The `publish.yml` GitHub Actions workflow needs to push packages to PyPI. The
+traditional approach stores a PyPI API token as a GitHub secret.
+
+**Decision:**
+Use [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC)
+so no long-lived credentials are stored in the repository.
+
+**Rationale:**
+- No secrets to rotate, leak, or revoke.
+- Publishing permission is scoped to a specific workflow file + environment,
+  not a project-wide token.
+- PyPI supports OIDC from GitHub Actions natively via `pypa/gh-action-pypi-publish`.
+
+**Manual step required:**
+One-time setup on PyPI to register the trusted publisher (documented in
+`docs/release.md`). This cannot be automated from within the workflow itself.
+
+
 
 **Status:** Accepted
 

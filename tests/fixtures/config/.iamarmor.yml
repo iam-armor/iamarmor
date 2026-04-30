@@ -1,0 +1,14 @@
+version: 1
+severity_threshold: low
+fail_on: medium
+
+rules:
+  ignore: [IAM004]
+  overrides:
+    IAM001:
+      severity: critical
+
+paths:
+  exclude:
+    - "examples/**"
+    - "**/.terraform/**"
