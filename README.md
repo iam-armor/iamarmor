@@ -1,16 +1,51 @@
 # iamarmor
-IAM Policy Analyzer & Fixer
 
-## Status: Week 3 — CLI + config + PyPI publish
+**ESLint for AWS IAM — catch over-permissioned policies in your Terraform PRs before they merge.**
 
-The `iamarmor lint` CLI is live. Install from PyPI, point it at a Terraform
-directory, and get actionable findings in seconds.
+[![PyPI version](https://img.shields.io/pypi/v/iamarmor.svg)](https://pypi.org/project/iamarmor/)
+[![Python versions](https://img.shields.io/pypi/pyversions/iamarmor.svg)](https://pypi.org/project/iamarmor/)
+[![CI](https://github.com/iam-armor/iamarmor/actions/workflows/ci.yml/badge.svg)](https://github.com/iam-armor/iamarmor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+---
+
+## Why iam-armor?
+
+IAM misconfigurations are the #1 cause of AWS breaches — wildcards on `Action` and
+`Resource`, forgotten `AdministratorAccess` attachments, and overly-permissive
+`assume_role_policy` are easy to ship and hard to spot in code review.
+
+`iamarmor` is a **static linter for Terraform IAM resources**. It runs entirely
+offline — no AWS credentials, no Terraform plan needed — and integrates as a
+pre-commit hook or a CI step in seconds. Think ESLint, but for your IAM policies.
+
+```
+$ iamarmor lint modules/iam/
+
+  modules/iam/main.tf
+  ✘ IAM001 [HIGH]   resource 'aws_iam_policy.app' has Action: "*" — grant least-privilege actions instead.
+  ✘ IAM005 [HIGH]   resource 'aws_iam_policy.deployer' grants iam:PassRole on Resource: "*" — scope to specific role ARNs.
+  ✘ IAM010 [HIGH]   resource 'aws_iam_role_policy_attachment.admin' attaches AdministratorAccess — grant only required permissions.
+
+  3 findings  (3 high, 0 medium, 0 low)  in 0.12 s
+  exit 1
+```
+
+---
+
+## Demo
+
+![iamarmor demo](docs/demo.gif)
+
+> Regenerate with: `vhs docs/demo.tape`
+
+---
 
 ## Quickstart
 
 ```bash
-# Install (requires Python 3.10+)
-pipx install iamarmor
+# Install (requires Python 3.11+)
+pip install iamarmor
 
 # Lint the current directory
 iamarmor lint .
@@ -26,6 +61,8 @@ iamarmor lint . --format json
 threshold (default: `medium`), **2** on usage/config errors, and **3** on
 internal errors — making CI integration trivial.
 
+---
+
 ## Configuration
 
 Place a `.iamarmor.yml` in the root of your Terraform repository:
@@ -36,27 +73,22 @@ severity_threshold: low   # report findings at or above this level (default: inf
 fail_on: high             # exit 1 only for high/critical (default: medium)
 
 rules:
-  ignore: [IAM004]        # skip specific rules
+  ignore: [IAM004]        # skip noisy rules for your environment
+  overrides:
+    IAM002:
+      severity: critical  # escalate a rule's severity
+
+paths:
+  exclude:
+    - "modules/legacy/**"  # skip paths you're not ready to fix yet
 ```
 
-iamarmor auto-discovers the config by walking upward from the linted path
-(same pattern as `.eslintrc`). Use `--no-config` to skip loading.
+iamarmor auto-discovers `.iamarmor.yml` by walking upward from the linted path
+(same pattern as `.eslintrc`). Pass `--no-config` to skip loading.
 
 See [docs/config.md](docs/config.md) for the full configuration reference.
 
-## Pre-commit
-
-Add to your `.pre-commit-config.yaml`:
-
-```yaml
-repos:
-  - repo: https://github.com/iam-armor/iamarmor
-    rev: v0.1.0
-    hooks:
-      - id: iamarmor
-```
-
-See [docs/pre-commit.md](docs/pre-commit.md) for details.
+---
 
 ## Default rule pack
 
@@ -75,7 +107,48 @@ iamarmor ships with **10 default IAM rules** covering the most common misconfigu
 | IAM009 | No `NotResource` in Allow statements | Medium |
 | IAM010 | Do not attach `AdministratorAccess` managed policy | High |
 
-See [STARTER_RULES.md](STARTER_RULES.md) for full documentation of each rule.
+See [STARTER_RULES.md](STARTER_RULES.md) for full documentation of each rule,
+including rationale, examples, and configuration options.
+
+---
+
+## Pre-commit hook
+
+Add to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/iam-armor/iamarmor
+    rev: v0.1.0
+    hooks:
+      - id: iamarmor
+```
+
+See [docs/pre-commit.md](docs/pre-commit.md) for details.
+
+---
+
+## GitHub Actions CI
+
+Add to your workflow to lint Terraform in every PR:
+
+```yaml
+- name: Lint IAM policies
+  run: |
+    pip install iamarmor
+    iamarmor lint . --fail-on high
+```
+
+Or pin a specific version:
+
+```yaml
+- name: Lint IAM policies
+  run: |
+    pip install iamarmor==0.1.0
+    iamarmor lint modules/iam/ --format json > iam-findings.json
+```
+
+---
 
 ## Python API
 
@@ -93,14 +166,54 @@ for finding in findings:
     print(f"[{finding.rule_id}] {finding.severity.value.upper()} — {finding.message}")
 ```
 
-## Installation (development)
+---
+
+## Regenerating the demo GIF
+
+The demo GIF was recorded with [VHS](https://github.com/charmbracelet/vhs).
+To regenerate it:
 
 ```bash
+# Install VHS (requires Go)
+go install github.com/charmbracelet/vhs@latest
+
+# Re-record
+vhs docs/demo.tape
+```
+
+The resulting `docs/demo.gif` is committed to the repository. The tape script
+exercises `iamarmor lint` against the bundled `tests/fixtures/` directory.
+
+---
+
+## Roadmap
+
+`iamarmor` (this repo) is the OSS linter engine. The hosted GitHub App at
+**[iamarmor.dev](https://iamarmor.dev)** (coming soon) will add:
+
+- 🔌 GitHub App with inline PR annotations
+- 📦 Premium rule packs: SOC 2, PCI-DSS, HIPAA, AWS Well-Architected Security
+- 📊 Findings dashboard and trend tracking
+- 🔧 One-click auto-fix suggestions
+
+---
+
+## Contributing
+
+Contributions are welcome! Please open an issue before submitting a PR for new
+features or rules. See [STARTER_RULES.md](STARTER_RULES.md) for the existing
+rule inventory and [docs/](docs/) for design docs.
+
+```bash
+git clone https://github.com/iam-armor/iamarmor.git
+cd iamarmor
 pip install -e ".[dev]"
-```
-
-## Running tests
-
-```bash
 pytest
+ruff check src/ tests/
 ```
+
+---
+
+## License
+
+[MIT](LICENSE) © 2026 iam-armor

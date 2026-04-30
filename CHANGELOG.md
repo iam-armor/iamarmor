@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] — Week 4 Polish
+
+### Added
+
+- **Polished README** rewritten for PyPI/Marketplace readiness: strong hero
+  tagline ("ESLint for AWS IAM"), PyPI/CI/license badges, "Why iam-armor" pitch,
+  extended Quickstart, example terminal output block, demo GIF placeholder with
+  regeneration instructions, `.iamarmor.yml` config example, pre-commit hook
+  snippet, GitHub Actions CI usage example, Roadmap section pointing at
+  `iamarmor.dev`, Contributing and License sections.
+- **`docs/demo.tape`** — runnable [VHS](https://github.com/charmbracelet/vhs)
+  script that exercises `iamarmor lint` against `tests/fixtures/` and records
+  `docs/demo.gif`. Regenerate with `vhs docs/demo.tape`.
+- **`STARTER_RULES.md`** extended with ❌/✅ labelled examples and a
+  "How to disable / configure" `.iamarmor.yml` snippet for every rule; premium
+  rule-pack teaser added at the end.
+- **`docs/DOGFOODING.md`** — dogfooding report against 5 real public Terraform
+  repos (`terraform-aws-modules/terraform-aws-iam`,
+  `gruntwork-io/terraform-aws-security`, `cloudposse/terraform-aws-iam-role`,
+  `hashicorp/terraform-aws-consul`, `trussworks/terraform-aws-iam-sleuth`),
+  including findings summaries and follow-up enhancement candidates.
+- **`.github/workflows/ci.yml`** updated: pip cache enabled; matrix narrowed to
+  Python 3.11 and 3.12; `pytest -q` (quieter output); separate `package` job
+  added that runs `python -m build` and `twine check dist/*` on every push to
+  confirm the wheel builds cleanly.
+
 ## [0.1.0] — 2026-04-30
 
 ### Added

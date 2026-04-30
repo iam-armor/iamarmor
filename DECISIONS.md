@@ -107,11 +107,8 @@ so no long-lived credentials are stored in the repository.
   not a project-wide token.
 - PyPI supports OIDC from GitHub Actions natively via `pypa/gh-action-pypi-publish`.
 
-**Manual step required:**
-One-time setup on PyPI to register the trusted publisher (documented in
-`docs/release.md`). This cannot be automated from within the workflow itself.
 
-
+## Week 4 — README rewritten for PyPI/Marketplace readiness; CI updated with Python 3.11+3.12 matrix and a dedicated `package` job (`python -m build` + `twine check`); `STARTER_RULES.md` extended with ❌/✅ examples and per-rule configuration snippets as the canonical default-rule reference; `docs/demo.tape` added as a reproducible VHS recording script; dogfooding pass documented in `docs/DOGFOODING.md` against 5 real public Terraform repos — no blocking bugs found, 3 follow-up enhancement candidates noted.
 
 **Status:** Accepted
 
