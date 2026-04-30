@@ -13,6 +13,7 @@ from iamarmor.cli.config import IamArmorConfig, discover_config, load_config
 from iamarmor.cli.reporters import json_report, text_report
 from iamarmor.exceptions import ConfigError, IamArmorError
 from iamarmor.rules import RuleEngine, Severity
+from iamarmor.rules.models import Rule
 
 app = typer.Typer(
     name="iamarmor",
@@ -199,8 +200,7 @@ def lint(
 
     # Apply config-level severity overrides
     if cfg and cfg.overrides:
-        from iamarmor.rules.models import Rule
-        overridden: list = []
+        overridden: list[Rule] = []
         for rule in rules:
             if rule.id in cfg.overrides:
                 ov = cfg.overrides[rule.id]

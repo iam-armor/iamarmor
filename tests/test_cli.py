@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -122,7 +123,6 @@ class TestLintNoConfig:
         bad_cfg = tmp_path / ".iamarmor.yml"
         bad_cfg.write_text("version: 1\nfail_on: INVALID\n")
         # Copy pass.tf into tmp dir
-        import shutil
         shutil.copy(IAM001_PASS, tmp_path / "pass.tf")
         result = runner.invoke(app, ["lint", "--no-config", str(tmp_path / "pass.tf")])
         assert result.exit_code == 0
@@ -130,7 +130,6 @@ class TestLintNoConfig:
     def test_malformed_config_exits_2(self, tmp_path):
         bad_cfg = tmp_path / ".iamarmor.yml"
         bad_cfg.write_text("version: 1\nfail_on: INVALID\n")
-        import shutil
         shutil.copy(IAM001_PASS, tmp_path / "pass.tf")
         result = runner.invoke(app, ["lint", str(tmp_path / "pass.tf")])
         assert result.exit_code == 2
