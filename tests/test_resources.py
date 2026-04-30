@@ -143,7 +143,7 @@ class TestExtractPolicyDocumentData:
         assert resources[0].name == "example"
 
 
-
+class TestExtractNoIamResources:
     def test_returns_empty_list(self):
         resources = _extract("no_iam_resources.tf")
         assert resources == []
