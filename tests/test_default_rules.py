@@ -71,8 +71,5 @@ class TestDefaultRuleFailFixture:
 
     def test_fail_fixture_finding_has_correct_rule_id(self, rule_id: str, fixture_dir: str):
         findings = _findings_for_fixture(rule_id, fixture_dir, "fail.tf")
-        for f in findings:
-            if f.rule_id == rule_id:
-                assert f.rule_id == rule_id
-                return
-        pytest.fail(f"No finding with rule_id={rule_id!r} in fail.tf findings")
+        matching = [f for f in findings if f.rule_id == rule_id]
+        assert matching, f"No finding with rule_id={rule_id!r} in fail.tf findings"

@@ -89,12 +89,6 @@ def load_default_rules() -> list[Rule]:
 
     import importlib.resources as pkg_resources
 
-    try:
-        # Python 3.9+: use files() API
-        ref = pkg_resources.files("iamarmor.rules").joinpath("default_pack.yml")
-        path = Path(str(ref))
-        return load_rules_from_yaml(path)
-    except (TypeError, AttributeError):
-        # Fallback: locate the file relative to this module
-        path = Path(__file__).parent / "default_pack.yml"
-        return load_rules_from_yaml(path)
+    ref = pkg_resources.files("iamarmor.rules").joinpath("default_pack.yml")
+    path = Path(str(ref))
+    return load_rules_from_yaml(path)
