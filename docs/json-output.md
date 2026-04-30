@@ -11,7 +11,7 @@ is **stable** and is the contract relied on by the future iamarmor GitHub App
   "version": 1,
   "tool": {
     "name": "iamarmor",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "summary": {
     "total": 3,

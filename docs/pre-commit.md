@@ -10,7 +10,7 @@ Add the following to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/iam-armor/iamarmor
-    rev: v0.1.0          # pin to the latest release tag
+    rev: v0.1.1          # pin to the latest release tag
     hooks:
       - id: iamarmor
 ```
@@ -32,7 +32,7 @@ You can pass extra args to the hook:
 ```yaml
 repos:
   - repo: https://github.com/iam-armor/iamarmor
-    rev: v0.1.0
+    rev: v0.1.1
     hooks:
       - id: iamarmor
         args: ["--fail-on", "high", "--format", "text"]

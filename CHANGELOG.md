@@ -28,6 +28,15 @@ All notable changes to this project will be documented in this file.
   added that runs `python -m build` and `twine check dist/*` on every push to
   confirm the wheel builds cleanly.
 
+## [0.1.1] — 2026-04-30
+
+### Fixed
+
+- Re-release to fix a failed PyPI upload of `0.1.0` (file name reuse blocked by
+  PyPI). No functional changes.
+- PyPI publish workflow (`publish.yml`) updated to use `skip-existing: true` so
+  re-runs do not fail when a file already exists on PyPI.
+
 ## [0.1.0] — 2026-04-30
 
 ### Added

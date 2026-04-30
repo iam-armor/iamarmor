@@ -119,7 +119,7 @@ Add to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/iam-armor/iamarmor
-    rev: v0.1.0
+    rev: v0.1.1
     hooks:
       - id: iamarmor
 ```
@@ -144,7 +144,7 @@ Or pin a specific version:
 ```yaml
 - name: Lint IAM policies
   run: |
-    pip install iamarmor==0.1.0
+    pip install iamarmor==0.1.1
     iamarmor lint modules/iam/ --format json > iam-findings.json
 ```
 

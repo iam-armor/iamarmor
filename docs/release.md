@@ -27,15 +27,15 @@ as a **trusted publisher** on PyPI:
 3. **Commit** the version bump and changelog update to `main`.
 4. **Tag** the commit and push:
    ```bash
-   git tag v0.1.0
-   git push origin v0.1.0
+   git tag v0.1.1
+   git push origin v0.1.1
    ```
 5. The `publish.yml` GitHub Actions workflow runs automatically:
    - Builds the wheel and sdist via `python -m build`.
    - Publishes to PyPI via OIDC — no secrets required.
 6. **Verify** the release:
    ```bash
-   pipx install iamarmor==0.1.0
+   pipx install iamarmor==0.1.1
    iamarmor --version
    ```
 
