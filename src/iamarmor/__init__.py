@@ -5,7 +5,7 @@ from .parser import parse_directory, parse_file
 from .resources import IamResource, extract_from_directory, extract_resources
 from .rules import Finding, Rule, RuleEngine, Severity, load_default_rules, load_rules_from_yaml
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 __all__ = [
     "__version__",

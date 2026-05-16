@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] — Rebranding: `scan` command + tagline refresh
+## [0.2.0] — 2026-05-16
 
 ### Changed
 
@@ -13,8 +13,6 @@ All notable changes to this project will be documented in this file.
 - Updated README tagline to: "A static analyzer for AWS IAM policies in
   Terraform — catch over-permissioned policies before they merge."
 - Removed third-party linter analogies and legacy config-file analogies across docs.
-
-## [Unreleased] — Week 4 Polish
 
 ### Added
 
@@ -31,10 +29,7 @@ All notable changes to this project will be documented in this file.
   "How to disable / configure" `.iamarmor.yml` snippet for every rule; premium
   rule-pack teaser added at the end.
 - **`docs/DOGFOODING.md`** — dogfooding report against 5 real public Terraform
-  repos (`terraform-aws-modules/terraform-aws-iam`,
-  `gruntwork-io/terraform-aws-security`, `cloudposse/terraform-aws-iam-role`,
-  `hashicorp/terraform-aws-consul`, `trussworks/terraform-aws-iam-sleuth`),
-  including findings summaries and follow-up enhancement candidates.
+  repos.
 - **`.github/workflows/ci.yml`** updated: pip cache enabled; matrix narrowed to
   Python 3.11 and 3.12; `pytest -q` (quieter output); separate `package` job
   added that runs `python -m build` and `twine check dist/*` on every push to
