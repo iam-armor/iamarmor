@@ -120,6 +120,11 @@ Add to your `.pre-commit-config.yaml`:
 repos:
   - repo: https://github.com/iam-armor/iamarmor
     rev: v0.2.0
+    hooks:
+      - id: iamarmor
+```
+
+See [docs/pre-commit.md](docs/pre-commit.md) for details.
 
 ---
 
