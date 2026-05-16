@@ -17,7 +17,7 @@ from iamarmor.rules.models import Rule
 
 app = typer.Typer(
     name="iamarmor",
-    help="IAM policy linter for Terraform.",
+    help="Static analyzer for AWS IAM policies in Terraform.",
     add_completion=False,
 )
 
@@ -63,11 +63,11 @@ def main_callback(
         help="Show version and exit.",
     ),
 ) -> None:
-    """iamarmor — IAM policy linter for Terraform."""
+    """iamarmor — static analyzer for AWS IAM policies in Terraform."""
 
 
 @app.command()
-def lint(
+def scan(
     path: Path = typer.Argument(
         Path("."),
         help="Path to Terraform files (file or directory). Defaults to current directory.",

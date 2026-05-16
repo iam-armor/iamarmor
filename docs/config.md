@@ -1,8 +1,7 @@
 # `.iamarmor.yml` Configuration Reference
 
 Place `.iamarmor.yml` in the root of your Terraform repository. iamarmor
-auto-discovers it by walking upward from the path you lint (same pattern as
-`.eslintrc` or `pyproject.toml`). You can also pass `--config <path>` to
+auto-discovers it by walking upward from the target path. You can also pass `--config <path>` to
 point at a specific file, or `--no-config` to ignore any config entirely.
 
 ## Supported keys

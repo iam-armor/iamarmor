@@ -22,7 +22,7 @@ pre-commit install
 ```
 
 From now on, every `git commit` will automatically run
-`iamarmor lint` against the repository root. Commits are blocked if any
+`iamarmor scan` against the repository root. Commits are blocked if any
 finding is at or above the `fail_on` threshold (default: `medium`).
 
 ## Customisation
@@ -51,5 +51,5 @@ pre-commit run iamarmor --all-files
 
 ```bash
 pipx install iamarmor
-iamarmor lint .
+iamarmor scan .
 ```
