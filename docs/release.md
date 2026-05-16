@@ -19,27 +19,29 @@ as a **trusted publisher** on PyPI:
 3. In the GitHub repository settings, create an **Environment** named `pypi`
    (no required reviewers needed for v1).
 
-## Release steps
+## Release steps (GitHub web UI — no local tagging required)
 
-1. **Bump version** in `pyproject.toml` and `src/iamarmor/__init__.py`.
-2. **Update `CHANGELOG.md`** — add a `## [X.Y.Z] — YYYY-MM-DD` section with
-   an `### Added` / `### Fixed` / `### Changed` breakdown.
-3. **Commit** the version bump and changelog update to `main`.
-4. **Tag** the commit and push:
-   ```bash
-   git tag v0.1.1
-   git push origin v0.1.1
-   ```
-5. The `publish.yml` GitHub Actions workflow runs automatically:
-   - Builds the wheel and sdist via `python -m build`.
-   - Publishes to PyPI via OIDC — no secrets required.
-6. **Verify** the release:
-   ```bash
-   pipx install iamarmor==0.1.1
-   iamarmor --version
-   ```
+All release steps are performed entirely on the GitHub website; no local
+`git tag` or `git push` commands are needed.
+
+1. **Bump version** in `pyproject.toml` and `src/iamarmor/__init__.py` on a
+   release branch, update `CHANGELOG.md`, and merge the PR to `main`.
+2. Open the repository on GitHub and click **Releases** in the right sidebar,
+   then **Draft a new release**.
+3. In the **Choose a tag** field, type the new tag (e.g. `v0.2.0`).
+   GitHub will offer to *create the tag on publish* — select **`main`** as the
+   target branch.
+4. Set the **Release title** to `v0.2.0` and paste the relevant section from
+   `CHANGELOG.md` into the description field.
+5. Click **Publish release**.
+6. GitHub automatically creates the tag on `main` and triggers the
+   `publish.yml` workflow. Monitor it under **Actions → publish**.
+7. **Verify** the release on PyPI:
+   - Visit <https://pypi.org/project/iamarmor/>
+   - Or run: `pip install iamarmor==0.2.0 && iamarmor --version`
 
 ## Hotfix releases
 
-Follow the same steps with a patch version bump (e.g. `0.1.1`). Never
+Follow the same steps with a patch version bump (e.g. `0.2.1`). Never
 re-tag an existing version — PyPI will reject the upload.
+

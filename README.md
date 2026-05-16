@@ -119,12 +119,7 @@ Add to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/iam-armor/iamarmor
-    rev: v0.1.1
-    hooks:
-      - id: iamarmor
-```
-
-See [docs/pre-commit.md](docs/pre-commit.md) for details.
+    rev: v0.2.0
 
 ---
 
@@ -144,7 +139,7 @@ Or pin a specific version:
 ```yaml
 - name: Scan IAM policies
   run: |
-    pip install iamarmor==0.1.1
+    pip install iamarmor==0.2.0
     iamarmor scan modules/iam/ --format json > iam-findings.json
 ```
 
