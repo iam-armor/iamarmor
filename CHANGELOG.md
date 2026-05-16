@@ -2,18 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] — Rebranding: `scan` command + tagline refresh
+
+### Changed
+
+- Renamed the CLI command from `lint` to `scan` with a clean break (no
+  compatibility alias).
+- Updated CLI-facing docs, examples, and pre-commit hook entrypoints to use
+  `scan`.
+- Updated README tagline to: "A static analyzer for AWS IAM policies in
+  Terraform — catch over-permissioned policies before they merge."
+- Removed third-party linter analogies and legacy config-file analogies across docs.
+
 ## [Unreleased] — Week 4 Polish
 
 ### Added
 
 - **Polished README** rewritten for PyPI/Marketplace readiness: strong hero
-  tagline ("ESLint for AWS IAM"), PyPI/CI/license badges, "Why iam-armor" pitch,
+  tagline, PyPI/CI/license badges, "Why iam-armor" pitch,
   extended Quickstart, example terminal output block, demo GIF placeholder with
   regeneration instructions, `.iamarmor.yml` config example, pre-commit hook
   snippet, GitHub Actions CI usage example, Roadmap section pointing at
   `iamarmor.dev`, Contributing and License sections.
 - **`docs/demo.tape`** — runnable [VHS](https://github.com/charmbracelet/vhs)
-  script that exercises `iamarmor lint` against `tests/fixtures/` and records
+  script that exercises `iamarmor scan` against `tests/fixtures/` and records
   `docs/demo.gif`. Regenerate with `vhs docs/demo.tape`.
 - **`STARTER_RULES.md`** extended with ❌/✅ labelled examples and a
   "How to disable / configure" `.iamarmor.yml` snippet for every rule; premium
@@ -41,7 +53,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **`iamarmor lint` CLI** (`src/iamarmor/cli/main.py`) built with
+- **`iamarmor scan` CLI** (`src/iamarmor/cli/main.py`) built with
   [Typer](https://typer.tiangolo.com/). Supports `--format text|json`,
   `--config`, `--no-config`, `--severity-threshold`, `--fail-on`,
   `--select`, `--ignore`, `--no-color`, `--verbose`, `--quiet`, `--version`.

@@ -51,7 +51,7 @@ registry (`@register_check` decorator).
 **Status:** Accepted
 
 **Context:**
-Week 3 required a polished CLI entry point for `iamarmor lint`. Both Click and
+Week 3 required a polished CLI entry point for `iamarmor scan`. Both Click and
 Typer were considered.
 
 **Decision:**
@@ -67,6 +67,23 @@ Use [Typer](https://typer.tiangolo.com/) (`typer >= 0.12`) as the CLI framework.
 **Trade-off:**
 One extra runtime dependency (Typer + Rich). The noticeably nicer CLI surface
 and reduced boilerplate justify this.
+
+## 2026-05 — Use `scan` as the only CLI verb and drop third-party linter analogy
+
+**Status:** Accepted
+
+**Decision:**
+Rename the CLI subcommand to `scan` and remove the old `lint` verb entirely, with
+no alias. Update positioning copy to remove third-party linter references and
+describe iamarmor directly as a static analyzer for Terraform IAM policies.
+
+**Rationale:**
+- The project has no active external users yet, so a clean break is cheaper than
+  carrying a long-term alias.
+- `scan` is clearer and more intuitive for security-focused workflows in CI and
+  pre-commit pipelines.
+- Avoiding third-party brand analogies reduces trademark risk and keeps product
+  messaging independent.
 
 ## 2026-04 — Hand-rolled YAML config validator (no pydantic/jsonschema)
 

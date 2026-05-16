@@ -1,6 +1,6 @@
 # Dogfooding Report — iamarmor CLI
 
-This document records the results of running `iamarmor lint` against real-world
+This document records the results of running `iamarmor scan` against real-world
 public Terraform repositories that manage AWS IAM resources. The goal is to
 validate that the CLI works correctly against production-grade code and to
 surface any bugs or edge cases.
@@ -19,10 +19,10 @@ pip install iamarmor   # or: pip install -e ".[dev]" from this repo
 git clone https://github.com/<owner>/<repo>.git /tmp/<repo>
 
 # 3. Run iamarmor against it
-iamarmor lint /tmp/<repo> --severity-threshold low
+iamarmor scan /tmp/<repo> --severity-threshold low
 
 # 4. Inspect JSON output for scripting
-iamarmor lint /tmp/<repo> --format json | jq '.findings | length'
+iamarmor scan /tmp/<repo> --format json | jq '.findings | length'
 ```
 
 Tips:
@@ -43,7 +43,7 @@ Covers IAM roles, policies, users, groups, and OIDC providers.
 
 **Command run:**
 ```bash
-iamarmor lint /tmp/terraform-aws-iam --severity-threshold low
+iamarmor scan /tmp/terraform-aws-iam --severity-threshold low
 ```
 
 **Summary of findings:**
@@ -70,7 +70,7 @@ Covers CloudTrail, Config, GuardDuty, IAM password policy, and cross-account IAM
 
 **Command run:**
 ```bash
-iamarmor lint /tmp/terraform-aws-security --severity-threshold low
+iamarmor scan /tmp/terraform-aws-security --severity-threshold low
 ```
 
 **Summary of findings:**
@@ -94,7 +94,7 @@ assume-role policies. Widely used in their EKS and ECS component catalog.
 
 **Command run:**
 ```bash
-iamarmor lint /tmp/terraform-aws-iam-role --severity-threshold low
+iamarmor scan /tmp/terraform-aws-iam-role --severity-threshold low
 ```
 
 **Summary of findings:**
@@ -117,7 +117,7 @@ EC2 auto-scaling groups with IAM instance profiles and role bindings.
 
 **Command run:**
 ```bash
-iamarmor lint /tmp/terraform-aws-consul --severity-threshold low
+iamarmor scan /tmp/terraform-aws-consul --severity-threshold low
 ```
 
 **Summary of findings:**
@@ -140,7 +140,7 @@ checks for stale access keys and alerts via SNS.
 
 **Command run:**
 ```bash
-iamarmor lint /tmp/terraform-aws-iam-sleuth --severity-threshold low
+iamarmor scan /tmp/terraform-aws-iam-sleuth --severity-threshold low
 ```
 
 **Summary of findings:**

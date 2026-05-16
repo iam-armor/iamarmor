@@ -1,6 +1,6 @@
 # iamarmor
 
-**ESLint for AWS IAM — catch over-permissioned policies in your Terraform PRs before they merge.**
+**A static analyzer for AWS IAM policies in Terraform — catch over-permissioned policies before they merge.**
 
 [![PyPI version](https://img.shields.io/pypi/v/iamarmor.svg)](https://pypi.org/project/iamarmor/)
 [![Python versions](https://img.shields.io/pypi/pyversions/iamarmor.svg)](https://pypi.org/project/iamarmor/)
@@ -15,12 +15,12 @@ IAM misconfigurations are the #1 cause of AWS breaches — wildcards on `Action`
 `Resource`, forgotten `AdministratorAccess` attachments, and overly-permissive
 `assume_role_policy` are easy to ship and hard to spot in code review.
 
-`iamarmor` is a **static linter for Terraform IAM resources**. It runs entirely
-offline — no AWS credentials, no Terraform plan needed — and integrates as a
-pre-commit hook or a CI step in seconds. Think ESLint, but for your IAM policies.
+`iamarmor` is a **static analyzer for Terraform IAM resources**. It runs entirely
+offline — no AWS credentials and no `terraform plan` required — and fits cleanly
+into your workflow as a pre-commit hook or CI step.
 
 ```
-$ iamarmor lint modules/iam/
+$ iamarmor scan modules/iam/
 
   modules/iam/main.tf
   ✘ IAM001 [HIGH]   resource 'aws_iam_policy.app' has Action: "*" — grant least-privilege actions instead.
@@ -47,17 +47,17 @@ $ iamarmor lint modules/iam/
 # Install (requires Python 3.11+)
 pip install iamarmor
 
-# Lint the current directory
-iamarmor lint .
+# Scan the current directory
+iamarmor scan .
 
-# Lint a specific file
-iamarmor lint modules/iam/main.tf
+# Scan a specific file
+iamarmor scan modules/iam/main.tf
 
 # Machine-readable output for CI pipelines
-iamarmor lint . --format json
+iamarmor scan . --format json
 ```
 
-`iamarmor lint` exits **0** when clean, **1** when findings meet the `fail_on`
+`iamarmor scan` exits **0** when clean, **1** when findings meet the `fail_on`
 threshold (default: `medium`), **2** on usage/config errors, and **3** on
 internal errors — making CI integration trivial.
 
@@ -83,8 +83,8 @@ paths:
     - "modules/legacy/**"  # skip paths you're not ready to fix yet
 ```
 
-iamarmor auto-discovers `.iamarmor.yml` by walking upward from the linted path
-(same pattern as `.eslintrc`). Pass `--no-config` to skip loading.
+iamarmor auto-discovers `.iamarmor.yml` by walking upward from the target path.
+Pass `--no-config` to skip loading.
 
 See [docs/config.md](docs/config.md) for the full configuration reference.
 
@@ -130,22 +130,22 @@ See [docs/pre-commit.md](docs/pre-commit.md) for details.
 
 ## GitHub Actions CI
 
-Add to your workflow to lint Terraform in every PR:
+Add to your workflow to scan Terraform in every PR:
 
 ```yaml
-- name: Lint IAM policies
+- name: Scan IAM policies
   run: |
     pip install iamarmor
-    iamarmor lint . --fail-on high
+    iamarmor scan . --fail-on high
 ```
 
 Or pin a specific version:
 
 ```yaml
-- name: Lint IAM policies
+- name: Scan IAM policies
   run: |
     pip install iamarmor==0.1.1
-    iamarmor lint modules/iam/ --format json > iam-findings.json
+    iamarmor scan modules/iam/ --format json > iam-findings.json
 ```
 
 ---
@@ -182,13 +182,13 @@ vhs docs/demo.tape
 ```
 
 The resulting `docs/demo.gif` is committed to the repository. The tape script
-exercises `iamarmor lint` against the bundled `tests/fixtures/` directory.
+exercises `iamarmor scan` against the bundled `tests/fixtures/` directory.
 
 ---
 
 ## Roadmap
 
-`iamarmor` (this repo) is the OSS linter engine. The hosted GitHub App at
+`iamarmor` (this repo) is the OSS static analyzer engine. The hosted GitHub App at
 **[iamarmor.dev](https://iamarmor.dev)** (coming soon) will add:
 
 - 🔌 GitHub App with inline PR annotations

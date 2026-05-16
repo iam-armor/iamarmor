@@ -91,6 +91,6 @@ is **stable** and is the contract relied on by the future iamarmor GitHub App
 ## Example — consuming the output in CI
 
 ```bash
-iamarmor lint . --format json > iamarmor-report.json
+iamarmor scan . --format json > iamarmor-report.json
 # Upload as a CI artifact, post to a GitHub Check, etc.
 ```
